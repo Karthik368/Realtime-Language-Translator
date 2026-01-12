@@ -2,6 +2,5 @@ streamlit
 speechrecognition
 deep-translator
 gTTS
-pygame
 pyaudio; platform_system=="Windows"
 numpy
