@@ -5,3 +5,4 @@ gTTS
 pygame
 pyaudio; platform_system=="Windows"
 numpy
+httpx>=0.25.0
