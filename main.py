@@ -16,11 +16,6 @@ except Exception:
     PYGAME_AVAILABLE = False
 
 # ----------------------------------
-# Translator setup
-# ----------------------------------
-# LANGUAGES = google_langs
-
-# ----------------------------------
 # Streamlit UI notice
 # ----------------------------------
 st.warning(
@@ -28,12 +23,13 @@ st.warning(
     "For full functionality, please run this app locally."
 )
 
-st.title("Real-Time Language Translator")
+st.title("🌍 Real-Time Language Translator")
 
 # ----------------------------------
-# Language filtering
+# Load supported languages (Google Translate)
 # ----------------------------------
 LANGUAGES = GoogleTranslator().get_supported_languages(as_dict=True)
+
 languages_to_remove = {
     'hy', 'az', 'eu', 'zh-tw', 'ny', 'nl', 'co', 'da', 'hr', 'cs', 'eo', 'et', 'am', 'sq', 'af',
     'ca', 'be', 'bs', 'bg', 'ceb', 'fi', 'fy', 'gl', 'ka', 'el', 'ht', 'ha', 'haw', 'hmn',
@@ -46,15 +42,21 @@ languages_to_remove = {
 filtered_languages = {
     code: name for code, name in LANGUAGES.items() if code not in languages_to_remove
 }
+
+# Mapping: Full Name → Code
 language_mapping = {name: code for code, name in filtered_languages.items()}
 
+# Sorted full language names
+language_names = sorted(language_mapping.keys())
+
+# gTTS supported languages
 supported_tts_languages = gtts_langs.tts_langs()
 
 # ----------------------------------
 # Helper functions
 # ----------------------------------
 def get_language_code(language_name):
-    return language_mapping.get(language_name, language_name)
+    return language_mapping.get(language_name)
 
 
 def translate_text(text, src_lang, dest_lang):
@@ -85,20 +87,30 @@ def text_to_voice(text, lang_code):
     else:
         st.warning("TTS not supported for this language.")
 
+# ----------------------------------
+# UI: Language Selection (FULL NAMES)
+# ----------------------------------
+from_lang_name = st.selectbox(
+    "Select Source Language",
+    language_names,
+    index=language_names.index("English") if "English" in language_names else 0
+)
 
-# ----------------------------------
-# UI Components
-# ----------------------------------
-from_lang_name = st.selectbox("Select Source Language", list(filtered_languages.values()))
-to_lang_name = st.selectbox("Select Target Language", list(filtered_languages.values()))
+to_lang_name = st.selectbox(
+    "Select Target Language",
+    language_names,
+    index=language_names.index("Hindi") if "Hindi" in language_names else 0
+)
 
 from_lang = get_language_code(from_lang_name)
 to_lang = get_language_code(to_lang_name)
 
+st.info(f"Source: {from_lang_name}  |  Target: {to_lang_name}")
+
 st.markdown("---")
 
 # ----------------------------------
-# Text-based translation (Cloud-safe)
+# Text-based Translation (Cloud-safe)
 # ----------------------------------
 input_text = st.text_area("Enter text to translate")
 
@@ -106,7 +118,7 @@ if st.button("Translate Text"):
     if input_text.strip():
         translated = translate_text(input_text, from_lang, to_lang)
         if translated:
-            st.success(f"Translated Text ({to_lang_name}):")
+            st.success(f"Translated from {from_lang_name} to {to_lang_name}:")
             st.write(translated)
             text_to_voice(translated, to_lang)
     else:
@@ -115,7 +127,7 @@ if st.button("Translate Text"):
 st.markdown("---")
 
 # ----------------------------------
-# Voice translation (Local only)
+# Voice Translation (Local Only)
 # ----------------------------------
 if st.button("🎤 Start Voice Translation (Local Only)"):
     if not PYGAME_AVAILABLE:
@@ -128,13 +140,21 @@ if st.button("🎤 Start Voice Translation (Local Only)"):
 
         try:
             spoken_text = recognizer.recognize_google(audio, language=from_lang)
-            st.write(f"Recognized: {spoken_text}")
+            st.write(f"Recognized ({from_lang_name}): {spoken_text}")
 
             translated = translate_text(spoken_text, from_lang, to_lang)
             if translated:
-                st.success(f"Translated ({to_lang_name}):")
+                st.success(f"Translated from {from_lang_name} to {to_lang_name}:")
                 st.write(translated)
                 text_to_voice(translated, to_lang)
 
         except Exception as e:
             st.error(f"Speech recognition error: {e}")
+
+# ----------------------------------
+# Language Support Info
+# ----------------------------------
+with st.expander("ℹ️ Language Support Info"):
+    st.write("📝 Text Translation: 100+ languages supported")
+    st.write("🔊 Voice Output: Limited to gTTS-supported languages")
+    st.write("🎤 Microphone: Works only in local environment")
