@@ -1,8 +1,7 @@
 streamlit
 speechrecognition
-googletrans==4.0.0-rc1
+deep-translator
 gTTS
 pygame
 pyaudio; platform_system=="Windows"
 numpy
-httpx>=0.25.0

@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import speech_recognition as sr
 from gtts import gTTS, lang as gtts_langs
-from googletrans import LANGUAGES, Translator
+from deep_translator import GoogleTranslator, google_langs
 import tempfile
 
 # ----------------------------------
@@ -18,7 +18,7 @@ except Exception:
 # ----------------------------------
 # Translator setup
 # ----------------------------------
-translator = Translator()
+# LANGUAGES = google_langs
 
 # ----------------------------------
 # Streamlit UI notice
@@ -33,6 +33,7 @@ st.title("Real-Time Language Translator")
 # ----------------------------------
 # Language filtering
 # ----------------------------------
+LANGUAGES = google_langs
 languages_to_remove = {
     'hy', 'az', 'eu', 'zh-tw', 'ny', 'nl', 'co', 'da', 'hr', 'cs', 'eo', 'et', 'am', 'sq', 'af',
     'ca', 'be', 'bs', 'bg', 'ceb', 'fi', 'fy', 'gl', 'ka', 'el', 'ht', 'ha', 'haw', 'hmn',
@@ -60,7 +61,8 @@ def translate_text(text, src_lang, dest_lang):
     if src_lang == dest_lang:
         return text
     try:
-        return translator.translate(text, src=src_lang, dest=dest_lang).text
+        translator = GoogleTranslator(source=src_lang, target=dest_lang)
+        return translator.translate(text)
     except Exception as e:
         st.error(f"Translation failed: {e}")
         return None
