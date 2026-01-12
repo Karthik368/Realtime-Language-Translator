@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import speech_recognition as sr
 from gtts import gTTS, lang as gtts_langs
-from deep_translator import GoogleTranslator, google_langs
+from deep_translator import GoogleTranslator
 import tempfile
 
 # ----------------------------------
@@ -33,7 +33,7 @@ st.title("Real-Time Language Translator")
 # ----------------------------------
 # Language filtering
 # ----------------------------------
-LANGUAGES = google_langs
+LANGUAGES = GoogleTranslator.get_supported_languages(as_dict=True)
 languages_to_remove = {
     'hy', 'az', 'eu', 'zh-tw', 'ny', 'nl', 'co', 'da', 'hr', 'cs', 'eo', 'et', 'am', 'sq', 'af',
     'ca', 'be', 'bs', 'bg', 'ceb', 'fi', 'fy', 'gl', 'ka', 'el', 'ht', 'ha', 'haw', 'hmn',
